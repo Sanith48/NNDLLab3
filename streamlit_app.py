@@ -21,6 +21,7 @@ def load_trained_model(path=MODEL_PATH):
         model = load_model(path)
         return model
     except Exception as e:
+        # Loading can fail silently inside Streamlit; surface the error
         st.error(f"Failed to load model from {path}: {e}")
         return None
 
@@ -71,15 +72,32 @@ def main():
             st.write(f'Label (ground truth): {LABELS[int(y_test[idx])] if y_test is not None else "-"}')
 
     if image_to_show is not None:
-        st.image(image_to_show, caption='Input image (resized to 32x32)', use_column_width=False)
+        st.image(image_to_show, caption='Input image (resized to 32x32)', use_container_width=False)
 
         if model is None:
             st.info('Model missing — cannot run prediction.')
         else:
+            st.success('Model loaded and ready')
             arr = preprocess_pil(image_to_show)
             if st.button('Predict'):
                 with st.spinner('Running prediction...'):
-                    predict_and_display(model, arr)
+                    try:
+                        preds = model.predict(arr)
+                        probs = preds.flatten()
+                        top_idx = np.argsort(probs)[::-1][:5]
+                        top_probs = probs[top_idx]
+                        top_labels = [LABELS[i] for i in top_idx]
+
+                        st.write('Top predictions:')
+                        for label, p in zip(top_labels, top_probs):
+                            st.write(f"- {label}: {p*100:.2f}%")
+
+                        # show a simple bar chart of top-5
+                        import pandas as pd
+                        df = pd.DataFrame({'label': top_labels, 'prob': top_probs})
+                        st.bar_chart(df.set_index('label'))
+                    except Exception as e:
+                        st.error(f'Prediction failed: {e}')
 
 
 if __name__ == '__main__':
