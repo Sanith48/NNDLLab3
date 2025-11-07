@@ -68,7 +68,29 @@ def main():
 
     model = load_trained_model()
     if model is None:
-        st.warning('Trained model not found in `checkpoints/FFN-ReLU-full50_best.h5`. Run the notebook to train and create the checkpoint, or place a compatible Keras .h5 model at that path.')
+        st.warning('Trained model not found. Run the notebook or training script to create a checkpoint in `checkpoints/`.')
+    else:
+        # Show which model file is being used (best-effort)
+        try:
+            st.write(f'Using model: {model.save.__self__.filepath}' )
+        except Exception:
+            # Fallback: report candidate path existence
+            cnn_p = os.path.join('checkpoints', 'CNN-aug_best.h5')
+            ffn_p = os.path.join('checkpoints', 'FFN-ReLU-full50_best.h5')
+            used = cnn_p if os.path.exists(cnn_p) else ffn_p if os.path.exists(ffn_p) else 'none'
+            st.write(f'Active model path: {used}')
+
+    # Try to read cached evaluation metrics (produced by evaluate_cnn.py)
+    metrics_path = os.path.join('plots', 'CNN_eval_metrics.json')
+    eval_metrics = None
+    if os.path.exists(metrics_path):
+        try:
+            import json
+            with open(metrics_path, 'r') as fh:
+                eval_metrics = json.load(fh)
+            st.info(f"Model test accuracy: {eval_metrics.get('accuracy'):.4f}")
+        except Exception:
+            pass
 
     source = st.radio('Image source', ['Upload image', 'Random CIFAR-10 test image'])
 

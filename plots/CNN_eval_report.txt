@@ -1,0 +1,21 @@
+Checkpoint: checkpoints/CNN-aug_best.h5
+Test loss: 0.792302
+Test acc: 0.735800
+
+Classification report:
+              precision    recall  f1-score   support
+
+    airplane     0.8133    0.7360    0.7727      1000
+  automobile     0.8497    0.9100    0.8788      1000
+        bird     0.7137    0.5060    0.5922      1000
+         cat     0.6376    0.4310    0.5143      1000
+        deer     0.6771    0.7110    0.6937      1000
+         dog     0.7454    0.5680    0.6447      1000
+        frog     0.5387    0.9530    0.6883      1000
+       horse     0.8047    0.7950    0.7998      1000
+        ship     0.9103    0.8520    0.8802      1000
+       truck     0.7901    0.8960    0.8397      1000
+
+    accuracy                         0.7358     10000
+   macro avg     0.7480    0.7358    0.7304     10000
+weighted avg     0.7480    0.7358    0.7304     10000
